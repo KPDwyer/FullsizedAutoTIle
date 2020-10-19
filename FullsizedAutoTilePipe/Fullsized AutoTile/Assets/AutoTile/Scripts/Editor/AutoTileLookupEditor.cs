@@ -143,7 +143,7 @@ public class AutoTileLookupEditor : Editor
     }
     private void TileMaskGUI(RuleTile.TilingRule _rule)
     {
-        int[] neighbours = _rule.m_Neighbors;
+        List<int> neighbours = _rule.m_Neighbors;
 
         int count = 0;
         EditorGUILayout.BeginVertical("box");
