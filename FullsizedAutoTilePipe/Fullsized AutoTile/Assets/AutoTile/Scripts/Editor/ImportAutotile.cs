@@ -19,22 +19,24 @@ public static class ImportAutotile
     {
 
         RuleTile.TilingRule m_rule = new RuleTile.TilingRule();
-        m_rule.m_Neighbors = new int[8];
+        int[] bitdiv = new int[8];
 
         int mask = 128;
         for (int i = 7; i >= 0; i--)
         {
             if (neighbourMask >= mask)
             {
-                m_rule.m_Neighbors[i] = 1;
+                bitdiv[i] = 1;
                 neighbourMask -= mask;
             }
             else
             {
-                m_rule.m_Neighbors[i] = 0;
+                bitdiv[i] = 0;
             }
             mask /= 2;
         }
+
+        m_rule.m_Neighbors.AddRange(bitdiv);
 
         //discard corner tiles if their cardinal neighbours are not needed.
         if (m_rule.m_Neighbors[0] == 1 &&
