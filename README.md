@@ -1,7 +1,7 @@
 # FullsizedAutoTile
 
 ## Usage
-Drag and drop an A2-formatted texture onto the Texture2D parameter on the RPGMaker_A2.  This will generate a series of sprites in `Autotiles/[texturename]/`, as well as a RuleTile in that same folder.  See the Examples folder for example usage & output.
+Drag and drop an A2-formatted texture onto the Texture2D parameter on the RPGMaker_A2.  This will generate a series of sprites in `Autotiles/[texturename]/`, as well as a RuleTile in that same folder.  For a more thorough Usage guide, see [usage.md](usage.md) (thanks Ivan!)
 
 ![ScriptableObject Usage](readmeassets/11_ScriptableAsset.png)
 
