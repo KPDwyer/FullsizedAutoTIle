@@ -11,7 +11,6 @@ public class AutoTileLookupEditor : Editor
     bool overrideRulesFromTile = false;
 
 
-    const int TILECOUNT = 47;//feel like I'm missing one here...
     const int SUBTILES = 4;
 
 
@@ -41,6 +40,10 @@ public class AutoTileLookupEditor : Editor
                 if (load)
                 {
                     lookup.m_maskValues = load.m_TilingRules;
+                    lookup.m_TileQuads = new int[lookup.m_maskValues.Count * SUBTILES];
+                    EditorUtility.SetDirty(lookup);
+                    AssetDatabase.SaveAssets();
+                    AssetDatabase.Refresh();
                 }
             }
             EditorGUILayout.EndVertical();
@@ -82,7 +85,7 @@ public class AutoTileLookupEditor : Editor
 
     private void SubTileMappingGUI(AutoTileLookup lookup)
     {
-        int totalInts = TILECOUNT * SUBTILES;
+        int totalInts = lookup.m_maskValues.Count * SUBTILES;
 
         if (lookup.m_TileQuads == null)
         {
@@ -98,7 +101,7 @@ public class AutoTileLookupEditor : Editor
             EditorGUILayout.LabelField("error with TileQuads param");
             if (GUILayout.Button("Fix/Reset"))
             {
-                lookup.m_TileQuads = new int[totalInts];
+                lookup.m_TileQuads = new int[lookup.m_maskValues.Count * SUBTILES];
                 EditorUtility.SetDirty(lookup);
                 AssetDatabase.SaveAssets();
                 AssetDatabase.Refresh();
@@ -108,13 +111,16 @@ public class AutoTileLookupEditor : Editor
         }
 
         EditorGUI.BeginChangeCheck();
-        for (int i = 0; i < TILECOUNT; i++)
+
+        for (int i = 0; i < lookup.m_maskValues.Count; i++)
         {
             EditorGUILayout.BeginHorizontal("box");
             if (lookup.m_maskValues != null && lookup.m_maskValues.Count > i)
             {
-
-                TileMaskGUI(lookup.m_maskValues[i]);
+                if (lookup.m_maskValues[i] != null)
+                {
+                    TileMaskGUI(lookup.m_maskValues[i]);
+                }
             }
             EditorGUILayout.BeginVertical();
 
@@ -128,9 +134,10 @@ public class AutoTileLookupEditor : Editor
             lookup.m_TileQuads[(i * 4) + 3] = EditorGUILayout.IntField(lookup.m_TileQuads[(i * 4) + 3]);
             EditorGUILayout.EndHorizontal();
 
+            EditorGUILayout.EndVertical();
+
             EditorGUILayout.EndHorizontal();
 
-            EditorGUILayout.EndVertical();
 
 
         }
@@ -143,26 +150,31 @@ public class AutoTileLookupEditor : Editor
     }
     private void TileMaskGUI(RuleTile.TilingRule _rule)
     {
-        List<int> neighbours = _rule.m_Neighbors;
-
-        int count = 0;
+        Dictionary<Vector3Int, int> neighbours = _rule.GetNeighbors();
         EditorGUILayout.BeginVertical("box");
 
-        for (int y = 0; y < 3; y++)
+        for (int y = -1; y <= 1; y++)
         {
             EditorGUILayout.BeginHorizontal();
-            for (int x = 0; x < 3; x++)
+            for (int x = -1; x <= 1; x++)
             {
-                if (x == 1 && y == 1)
+                if (x == 0 && y == 0)
                 {
                     GUI.color = Color.white;
                     EditorGUILayout.Toggle(false);
                 }
                 else
                 {
-                    GUI.color = neighbours[count] == 1 ? Color.green : Color.red;
-                    EditorGUILayout.Toggle(neighbours[count] == 1);
-                    count++;
+                    if (neighbours.ContainsKey(new Vector3Int(x, y, 0)))
+                    {
+                        GUI.color = neighbours[new Vector3Int(x, y, 0)] == 1 ? Color.green : Color.red;
+                        EditorGUILayout.Toggle(neighbours[new Vector3Int(x, y, 0)] == 1);
+                    }
+                    else
+                    {
+                        GUI.color = Color.white;
+                        EditorGUILayout.Toggle(false);
+                    }
                 }
             }
             EditorGUILayout.EndHorizontal();
